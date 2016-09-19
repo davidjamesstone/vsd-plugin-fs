@@ -21,7 +21,7 @@ module.exports = {
     validate: {
       payload: {
         path: Joi.string().required(),
-        contents: Joi.string().required()
+        contents: Joi.string().allow('')
       }
     }
   }

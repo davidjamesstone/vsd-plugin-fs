@@ -67,7 +67,7 @@ function VsdFsService (client, options) {
 
   function rename (oldPath, newPath, callback) {
     client.request({
-      path: '/rename',
+      path: mount + '/rename',
       payload: {
         oldPath: oldPath,
         newPath: newPath

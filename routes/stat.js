@@ -1,21 +1,19 @@
-var Joi = require('joi')
-var Boom = require('boom')
-var fileutils = require('../file-system-utils')
+const Joi = require('joi')
+const Boom = require('boom')
+const fileutils = require('../file-system-utils')
 
 module.exports = {
   method: 'GET',
   path: '/stat',
   config: {
-    handler: function (request, reply) {
-      var path = request.query.path
+    handler: async (request, reply) => {
+      const path = request.query.path
 
-      fileutils.stat(path, function (err, data) {
-        if (err) {
-          return reply(Boom.badRequest('Stat failed', err))
-        }
-
-        reply(data)
-      })
+      try {
+        return await fileutils.stat(path)
+      } catch (err) {
+        return Boom.badRequest('Stat failed', err)
+      }
     },
     validate: {
       query: {

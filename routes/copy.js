@@ -1,22 +1,21 @@
-var Joi = require('joi')
-var Boom = require('boom')
-var fileutils = require('../file-system-utils')
+const Joi = require('joi')
+const Boom = require('boom')
+const fileutils = require('../file-system-utils')
 
 module.exports = {
   method: 'POST',
   path: '/copy',
-  config: {
-    handler: function (request, reply) {
-      var source = request.payload.source
-      var destination = request.payload.destination
+  options: {
+    handler: async (request, h) => {
+      const payload = request.payload
+      const source = payload.source
+      const destination = payload.destination
 
-      fileutils.copy(source, destination, function (err, data) {
-        if (err) {
-          return reply(Boom.badRequest('Copy failed', err))
-        }
-
-        reply(data)
-      })
+      try {
+        return await fileutils.copy(source, destination)
+      } catch (err) {
+        return Boom.badRequest('Copy failed', err)
+      }
     },
     validate: {
       payload: {

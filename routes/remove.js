@@ -1,21 +1,19 @@
-var Joi = require('joi')
-var Boom = require('boom')
-var fileutils = require('../file-system-utils')
+const Joi = require('joi')
+const Boom = require('boom')
+const fileutils = require('../file-system-utils')
 
 module.exports = {
   method: 'DELETE',
   path: '/remove',
   config: {
-    handler: function (request, reply) {
-      var path = request.payload.path
+    handler: async (request, reply) => {
+      const path = request.payload.path
 
-      fileutils.remove(path, function (err, data) {
-        if (err) {
-          return reply(Boom.badRequest('Remove failed', err))
-        }
-
-        reply(data)
-      })
+      try {
+        return await fileutils.remove(path)
+      } catch (err) {
+        return Boom.badRequest('Remove failed', err)
+      }
     },
     validate: {
       payload: {

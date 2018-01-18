@@ -1,7 +1,5 @@
-var util = require('util')
-
 module.exports = {
-  extend: util._extend,
+  extend: Object.assign,
   rndstr: function () {
     return (+new Date()).toString(36)
   },

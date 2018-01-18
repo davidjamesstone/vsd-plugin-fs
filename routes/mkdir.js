@@ -1,21 +1,19 @@
-var Joi = require('joi')
-var Boom = require('boom')
-var fileutils = require('../file-system-utils')
+const Joi = require('joi')
+const Boom = require('boom')
+const fileutils = require('../file-system-utils')
 
 module.exports = {
   method: 'POST',
   path: '/mkdir',
-  config: {
-    handler: function (request, reply) {
-      var path = request.payload.path
+  options: {
+    handler: async (request, h) => {
+      const path = request.payload.path
 
-      fileutils.mkdir(path, function (err, data) {
-        if (err) {
-          return reply(Boom.badRequest('Make directory failed', err))
-        }
-
-        reply(data)
-      })
+      try {
+        return await fileutils.mkdir(path)
+      } catch (err) {
+        return Boom.badRequest('Make directory failed', err)
+      }
     },
     validate: {
       payload: {

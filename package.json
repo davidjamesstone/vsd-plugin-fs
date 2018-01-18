@@ -1,10 +1,12 @@
 {
   "name": "vsd-plugin-fs",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node test/server"
+    "lint": "standard",
+    "unit-test": "lab",
+    "test": "npm run lint && npm run unit-tests"
   },
   "repository": {
     "type": "git",
@@ -18,11 +20,17 @@
   "homepage": "https://github.com/davidjamesstone/vsd-plugin-fs#readme",
   "dependencies": {
     "filesize": "3.3.0",
+    "fs-extra": "5.0.0",
     "is-utf8": "0.2.1",
     "ncp": "2.0.0",
     "rimraf": "2.5.4"
   },
   "peerDependencies": {
-    "hapi": "^13.x.x"
+    "hapi": "^17.x.x"
+  },
+  "devDependencies": {
+    "code": "5.1.2",
+    "lab": "15.2.0",
+    "standard": "10.0.3"
   }
 }

@@ -1,4 +1,5 @@
 const fs = require('fs')
+const util = require('util')
 const path = require('path')
 const isUtf8 = require('is-utf8')
 const p = require('path')
@@ -26,7 +27,9 @@ function sorter (a, b) {
   }
 }
 
-exports.remove = function (path, callback) {
+const fsu = {}
+
+fsu.remove = function (path, callback) {
   fs.lstat(path, function (err, stat) {
     if (err) {
       return callback(err)
@@ -44,9 +47,13 @@ exports.remove = function (path, callback) {
   })
 }
 
-exports.rename = function (oldPath, newPath, callback) {
-  fs.exists(newPath, function (exists) {
-    if (exists) {
+fsu.rename = function (oldPath, newPath, callback) {
+  fs.lstat(newPath, function (err, stat) {
+    if (err) {
+      return callback(err)
+    }
+
+    if (stat) {
       return callback(new Error('File already exists'))
     }
 
@@ -67,11 +74,15 @@ exports.rename = function (oldPath, newPath, callback) {
   })
 }
 
-exports.copy = function (source, destination, callback) {
-  fs.exists(destination, function (exists) {
-    if (exists || (source === destination)) {
+fsu.copy = function (source, destination, callback) {
+  fs.lstat(destination, function (err, stat) {
+    if (err) {
+      return callback(err)
+    }
+
+    if (stat || (source === destination)) {
       // add random str to destination
-      var ext = p.extname(destination)
+      const ext = p.extname(destination)
       destination = p.join(p.dirname(destination), p.basename(destination, ext) + '_' + common.rndstr() + ext)
     }
 
@@ -89,7 +100,7 @@ exports.copy = function (source, destination, callback) {
   })
 }
 
-exports.writeFile = function (path, contents, callback) {
+fsu.writeFile = function (path, contents, callback) {
   fs.writeFile(path, contents, 'utf8', function (err) {
     if (err) {
       return callback(err)
@@ -101,13 +112,13 @@ exports.writeFile = function (path, contents, callback) {
   })
 }
 
-exports.readFile = function (path, callback) {
+fsu.readFile = function (path, callback) {
   fs.lstat(path, function (err, stat) {
     if (err) {
       return callback(err)
     }
 
-    var fileSizeInMegabytes = stat.size / 1e6
+    const fileSizeInMegabytes = stat.size / 1e6
     if (fileSizeInMegabytes > maxAllowedFileRead) {
       return callback(new Error('File size limit ' + maxAllowedFileRead + 'MB'))
     }
@@ -117,7 +128,7 @@ exports.readFile = function (path, callback) {
         return callback(err)
       }
 
-      var contents = isUtf8(buffer) ? buffer.toString('utf8') : buffer
+      const contents = isUtf8(buffer) ? buffer.toString('utf8') : buffer
 
       callback(null, common.extend(new FileSystemObject(path, stat), {
         contents: contents
@@ -126,14 +137,14 @@ exports.readFile = function (path, callback) {
   })
 }
 
-exports.readDir = function (dir, callback) {
-  var results = []
+fsu.readDir = function (dir, callback) {
+  const results = []
   fs.readdir(dir, function (err, list) {
     if (err) {
       return callback(err)
     }
 
-    var pending = list.length
+    let pending = list.length
 
     if (!pending) {
       return callback(null, results)
@@ -156,7 +167,7 @@ exports.readDir = function (dir, callback) {
   })
 }
 
-exports.mkdir = function (path, callback) {
+fsu.mkdir = function (path, callback) {
   fs.mkdir(path, '755', function (err) {
     if (err) {
       return callback(err)
@@ -168,8 +179,14 @@ exports.mkdir = function (path, callback) {
   })
 }
 
-exports.stat = function (path, callback) {
+fsu.stat = function (path, callback) {
   fs.lstat(path, function (err, stat) {
     callback(err, err ? null : new FileSystemObject(path, stat))
   })
 }
+
+for (let key in fsu) {
+  fsu[key] = util.promisify(fsu[key])
+}
+
+module.exports = fsu

@@ -1,7 +1,7 @@
 const p = require('path')
 const filesize = require('filesize')
 
-var FileSystemObject = function (path, stat) {
+const FileSystemObject = function (path, stat) {
   this.name = p.basename(path) || path
   this.path = path
   this.dir = p.dirname(path)

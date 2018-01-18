@@ -1,7 +1,7 @@
 // Nes websocket service
 function VsdFsService (client, options) {
   options = options || {}
-  var mount = options.mount || ''
+  const mount = options.mount || ''
 
   function stat (path, callback) {
     client.request({

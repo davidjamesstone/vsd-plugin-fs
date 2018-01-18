@@ -1,19 +1,19 @@
-var Joi = require('joi')
-var Boom = require('boom')
-var fileutils = require('../file-system-utils')
+const Joi = require('joi')
+const Boom = require('boom')
+const fileutils = require('../file-system-utils')
 
 module.exports = {
   method: 'GET',
   path: '/readfile',
-  config: {
-    handler: function (request, reply) {
-      fileutils.readFile(request.query.path, function (err, data) {
-        if (err) {
-          return reply(Boom.badRequest('Read file failed', err))
-        }
+  options: {
+    handler: async (request, h) => {
+      const path = request.query.path
 
-        reply(data)
-      })
+      try {
+        return await fileutils.readFile(path)
+      } catch (err) {
+        return Boom.badRequest('Read file failed', err)
+      }
     },
     validate: {
       query: {

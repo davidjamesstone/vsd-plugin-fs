@@ -48,12 +48,8 @@ fsu.remove = function (path, callback) {
 }
 
 fsu.rename = function (oldPath, newPath, callback) {
-  fs.lstat(newPath, function (err, stat) {
-    if (err) {
-      return callback(err)
-    }
-
-    if (stat) {
+  fs.access(newPath, function (err, stat) {
+    if (!err || stat) {
       return callback(new Error('File already exists'))
     }
 
